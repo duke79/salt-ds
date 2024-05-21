@@ -1,4 +1,4 @@
-import { Badge, Button, StackLayout } from "@salt-ds/core";
+import { Badge } from "@salt-ds/core";
 import {
   BankCheckIcon,
   CreditCardIcon,
@@ -9,6 +9,7 @@ import {
 import { TabNext, TabstripNext, type TabstripNextProps } from "@salt-ds/lab";
 import type { StoryFn } from "@storybook/react";
 import { type ComponentType, useState } from "react";
+
 import "./tabstrip-next.stories.css";
 
 export default {
@@ -23,7 +24,7 @@ export default {
 type TabstripStory = StoryFn<
   TabstripNextProps & {
     width?: number;
-    tabs: string[];
+    tabs?: string[];
   }
 >;
 
@@ -37,7 +38,7 @@ const tabToIcon: Record<string, ComponentType> = {
 
 const TabstripTemplate: TabstripStory = ({
   width = 600,
-  tabs,
+  tabs = [],
   ...tabstripProps
 }) => {
   return (
@@ -60,7 +61,7 @@ DefaultLeftAligned.args = {
 
 export const MainTabBleedingIntoPrimaryBackground: TabstripStory = ({
   width = 600,
-  tabs,
+  tabs = [],
   ...tabstripProps
 }) => {
   return (
@@ -92,7 +93,7 @@ MainTabBleedingIntoPrimaryBackground.args = {
 
 export const MainTabBleedingIntoSecondaryBackground: TabstripStory = ({
   width = 600,
-  tabs,
+  tabs = [],
   ...tabstripProps
 }) => {
   return (
@@ -131,7 +132,7 @@ Inline.args = {
 
 export const InlineWithSecondaryBackground: TabstripStory = ({
   width = 600,
-  tabs,
+  tabs = [],
   ...tabstripProps
 }) => {
   return (
@@ -169,7 +170,7 @@ RightAligned.args = {
 
 export const WithIcon: TabstripStory = ({
   width = 600,
-  tabs,
+  tabs = [],
   ...tabstripProps
 }) => {
   return (
@@ -183,7 +184,7 @@ export const WithIcon: TabstripStory = ({
               key={label}
               disabled={label === "Transactions"}
             >
-              <Icon /> {label}
+              <Icon aria-hidden /> {label}
             </TabNext>
           );
         })}
@@ -198,7 +199,7 @@ WithIcon.args = {
 
 export const WithBadge: TabstripStory = ({
   width = 600,
-  tabs,
+  tabs = [],
   ...tabstripProps
 }) => {
   return (
@@ -216,39 +217,6 @@ export const WithBadge: TabstripStory = ({
 };
 
 WithBadge.args = {
-  tabs: ["Home", "Transactions", "Loans", "Checks", "Liquidity"],
-};
-
-export const ControlledTabstrip: TabstripStory = ({
-  width = 600,
-  tabs,
-  ...tabstripProps
-}) => {
-  const [value, setValue] = useState<string>(tabs[0]);
-
-  return (
-    <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
-      <StackLayout gap={1} direction="row" align="center">
-        <Button onClick={() => setValue("Home")}>Home</Button>
-        <TabstripNext
-          {...tabstripProps}
-          value={value}
-          onChange={(_, { value }) => {
-            setValue(value);
-          }}
-        >
-          {tabs.map((label) => (
-            <TabNext value={label} key={label}>
-              {label}
-            </TabNext>
-          ))}
-        </TabstripNext>
-        <Button onClick={() => setValue("Liquidity")}>End</Button>
-      </StackLayout>
-    </div>
-  );
-};
-ControlledTabstrip.args = {
   tabs: ["Home", "Transactions", "Loans", "Checks", "Liquidity"],
 };
 
@@ -273,4 +241,59 @@ LotsOfTabsTabstrip.args = {
     "Larger",
     "Screens",
   ],
+};
+
+export const Dismissable: TabstripStory = ({
+  width = 600,
+  ...tabstripProps
+}) => {
+  const [tabs, setTabs] = useState([
+    "Home",
+    "Transactions",
+    "Loans",
+    "Checks",
+    "Liquidity",
+  ]);
+
+  return (
+    <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
+      <TabstripNext defaultValue={tabs[0]} {...tabstripProps}>
+        {tabs.map((label) => (
+          <TabNext
+            value={label}
+            key={label}
+            onClose={() => {
+              setTabs(tabs.filter((tab) => tab !== label));
+            }}
+          >
+            {label}
+            {label === "Transactions" && <Badge value={2} />}
+          </TabNext>
+        ))}
+      </TabstripNext>
+    </div>
+  );
+};
+
+export const AddTabs: TabstripStory = ({ width = 600, ...tabstripProps }) => {
+  const [tabs, setTabs] = useState(["Tab 1", "Tab 2", "Tab 3"]);
+
+  return (
+    <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
+      <TabstripNext
+        defaultValue={tabs[0]}
+        onAdd={() => {
+          setTabs((old) => old.concat([`Tab ${old.length + 1}`]));
+        }}
+        {...tabstripProps}
+      >
+        {tabs.map((label) => (
+          <TabNext value={label} key={label}>
+            {label}
+            {label === "Transactions" && <Badge value={2} />}
+          </TabNext>
+        ))}
+      </TabstripNext>
+    </div>
+  );
 };

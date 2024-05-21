@@ -1,34 +1,42 @@
-import { makePrefixer } from "@salt-ds/core";
+import { Button, makePrefixer, useForkRef } from "@salt-ds/core";
 import { useComponentCssInjection } from "@salt-ds/styles";
 import { useWindow } from "@salt-ds/window";
+import clsx from "clsx";
 import {
   type ComponentPropsWithoutRef,
-  type FocusEvent,
+  type KeyboardEvent,
   type MouseEvent,
   type ReactElement,
   forwardRef,
   useEffect,
+  useId,
+  useRef,
+  useState,
 } from "react";
 
-import { OverflowItem } from "@fluentui/react-overflow";
-import clsx from "clsx";
+import { CloseIcon } from "@salt-ds/icons";
 import tabCss from "./TabNext.css";
 import { useTabs } from "./TabNextContext";
 
 const withBaseName = makePrefixer("saltTabNext");
 
-export interface TabNextProps extends ComponentPropsWithoutRef<"button"> {
+export interface TabNextProps extends ComponentPropsWithoutRef<"div"> {
   /* Value prop is mandatory and must be unique in order for overflow to work. */
+  disabled?: boolean;
   value: string;
+  onClose?: () => void;
 }
 
-export const TabNext = forwardRef<HTMLButtonElement, TabNextProps>(
+export const TabNext = forwardRef<HTMLDivElement, TabNextProps>(
   function Tab(props, ref): ReactElement<TabNextProps> {
     const {
+      "aria-labelledby": ariaLabelledBy,
       children,
       className,
       disabled: disabledProp,
       onClick,
+      onClose,
+      onKeyDown,
       onFocus,
       value,
       ...rest
@@ -40,61 +48,89 @@ export const TabNext = forwardRef<HTMLButtonElement, TabNextProps>(
       window: targetWindow,
     });
     const {
-      activeColor,
-      isActive,
-      activate,
-      isFocusable,
-      setFocusable,
-      disabled: tabstripDisabled,
-      unregisterTab,
-      registerTab,
+      registerItem,
       variant,
+      setSelected,
+      selected,
+      focusInside,
+      handleClose,
     } = useTabs();
-    const active = isActive(value);
-    const focusable = isFocusable(value);
-    const disabled = tabstripDisabled || disabledProp;
+    const disabled = disabledProp;
 
-    const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-      activate(event);
+    const tabRef = useRef<HTMLDivElement>(null);
+    const handleRef = useForkRef(ref, tabRef);
+
+    const handleClick = (event: MouseEvent<HTMLDivElement>) => {
       onClick?.(event);
+      setSelected(event, value);
     };
 
-    const handleFocus = (event: FocusEvent<HTMLButtonElement>) => {
-      setFocusable(value);
-      onFocus?.(event);
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown?.(event);
+
+      if (event.key === "Enter" || event.key === " ") {
+        setSelected(event, value);
+      }
     };
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     useEffect(() => {
-      registerTab({ value, label: children });
-      return () => unregisterTab(value);
-    }, [children, registerTab, unregisterTab, value]);
+      if (value && tabRef.current) {
+        return registerItem({ id: value, element: tabRef.current });
+      }
+    }, [value]);
+
+    const closeButtonId = useId();
+    const labelId = useId();
+
+    const [focused, setFocused] = useState(false);
+
+    const handleFocus = () => {
+      setFocused(true);
+    };
+
+    const handleBlur = () => {
+      setFocused(false);
+    };
+
+    const handleCloseButton = (event: MouseEvent<HTMLButtonElement>) => {
+      onClose?.();
+      handleClose(event, value);
+      event.stopPropagation();
+    };
 
     return (
-      <OverflowItem id={value} priority={active ? 2 : 1}>
-        <div className={withBaseName("wrapper")}>
-          <button
-            className={clsx(
-              withBaseName(),
-              withBaseName(variant),
-              withBaseName(activeColor),
-              className,
-            )}
-            data-value={value}
-            aria-selected={active}
-            disabled={disabled}
-            value={value}
-            ref={ref}
-            role="tab"
-            onClick={handleClick}
-            onFocus={handleFocus}
-            tabIndex={focusable && !disabled ? 0 : -1}
-            type="button"
-            {...rest}
+      <div
+        className={clsx(withBaseName(), withBaseName(variant), className)}
+        data-value={value}
+        aria-selected={selected === value || undefined}
+        aria-disabled={disabled}
+        tabIndex={selected === value ? 0 : -1}
+        ref={handleRef}
+        role="tab"
+        onClick={!disabled ? handleClick : undefined}
+        onKeyDown={!disabled ? handleKeyDown : undefined}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        aria-labelledby={clsx(ariaLabelledBy, labelId)}
+        {...rest}
+      >
+        <span className={withBaseName("label")} aria-hidden id={labelId}>
+          {children}
+        </span>
+        {onClose ? (
+          <Button
+            aria-label="Dismiss tab"
+            id={closeButtonId}
+            aria-labelledby={clsx(closeButtonId, labelId)}
+            tabIndex={focused || (!focusInside && selected === value) ? 0 : -1}
+            variant="secondary"
+            onClick={handleCloseButton}
           >
-            {children}
-          </button>
-        </div>
-      </OverflowItem>
+            <CloseIcon aria-hidden />
+          </Button>
+        ) : null}
+      </div>
     );
   },
 );
