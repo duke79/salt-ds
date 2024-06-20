@@ -8,5 +8,9 @@ export const formatComponentExampleName = (
     return displayName;
   }
   const formattedName = exampleName.match(exampleNameRegex);
-  return formattedName ? formattedName.join(" ") : exampleName;
+  return formattedName
+    ? formattedName
+        .map((part, index) => (index === 0 ? part : part.toLowerCase()))
+        .join(" ")
+    : exampleName;
 };
