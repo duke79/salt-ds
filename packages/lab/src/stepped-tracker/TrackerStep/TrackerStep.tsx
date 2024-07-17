@@ -1,5 +1,7 @@
 import { makePrefixer } from "@salt-ds/core";
 import {
+  ChevronUpIcon,
+  ChevronDownIcon,
   StepActiveIcon,
   StepDefaultIcon,
   StepSuccessIcon,
@@ -9,7 +11,7 @@ import {
 import { useComponentCssInjection } from "@salt-ds/styles";
 import { useWindow } from "@salt-ds/window";
 import { clsx } from "clsx";
-import { type ComponentPropsWithoutRef, forwardRef, useEffect } from "react";
+import { type ComponentPropsWithoutRef, forwardRef, useEffect, useState } from "react";
 import { TrackerConnector } from "../TrackerConnector";
 
 import {
@@ -35,6 +37,14 @@ export interface TrackerStepProps extends ComponentPropsWithoutRef<"li"> {
    * The nesting depth of the TrackerStep
    */
   depth?: Depth;
+  /**
+   * Can the TrackerStep be collapsed?
+   */
+  collapsible?: boolean;
+  /**
+   * Is the collapsible TrackerStep expanded?
+   */
+  expanded?: boolean;
 }
 
 const iconMap = {
@@ -74,6 +84,13 @@ const getState = ({
   return state;
 };
 
+const ExpansionIcon = ({ expanded }: { expanded: boolean }) => {
+  if (expanded) {
+    return <ChevronUpIcon aria-hidden className={withBaseName("expansion-toggle-icon")} />;
+  }
+  return <ChevronDownIcon aria-hidden className={withBaseName("expansion-toggle-icon")} />;
+}
+
 const useCheckWithinSteppedTracker = (isWithinSteppedTracker: boolean) => {
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") {
@@ -93,6 +110,8 @@ export const TrackerStep = forwardRef<HTMLLIElement, TrackerStepProps>(
       style,
       className,
       children,
+      collapsible  = false,
+      expanded: expandedProp = true,
       depth = 0,
       ...restProps
     } = props;
@@ -104,9 +123,12 @@ export const TrackerStep = forwardRef<HTMLLIElement, TrackerStepProps>(
       window: targetWindow,
     });
 
+    const [expanded, setExpanded] = useState(expandedProp);
+
     const { activeStep, totalSteps, isWithinSteppedTracker } =
       useSteppedTrackerContext();
-    const stepNumber = useTrackerStepContext();
+    const { stepNumber, parents } = useTrackerStepContext();
+    console.log(stepNumber, parents);
 
     useCheckWithinSteppedTracker(isWithinSteppedTracker);
 
@@ -117,10 +139,18 @@ export const TrackerStep = forwardRef<HTMLLIElement, TrackerStepProps>(
     const hasConnector = stepNumber < totalSteps - 1;
     const depthClass = withBaseName(`depth-${depth}`);
     const iconSize = depth > 0 ? 1 : 1.5;
+    const expandedClass = withBaseName(expanded ? "expanded" : "collapsed");
+    const stepNumberClass = withBaseName(`step-${stepNumber}`);
+    const parentClasses = parents.map((parent) => withBaseName(`child-of-${parent}`));
 
     const innerStyle = {
       ...style,
       "--saltTrackerStep-width": `${100 / totalSteps}%`,
+    };
+
+    const handleClick = () => {
+      console.log('toggling step expansion')
+      setExpanded((prev) => !prev);
     };
 
     return (
@@ -129,6 +159,9 @@ export const TrackerStep = forwardRef<HTMLLIElement, TrackerStepProps>(
           withBaseName(),
           withBaseName(resolvedState),
           depthClass,
+          expandedClass,
+          stepNumberClass,
+          ...parentClasses,
           className
         )}
         style={innerStyle}
@@ -138,10 +171,20 @@ export const TrackerStep = forwardRef<HTMLLIElement, TrackerStepProps>(
         {...restProps}
       >
         <div className={withBaseName("indicator")}>
-          <Icon size={iconSize}/>
+          <Icon className={withBaseName("icon")} size={iconSize}/>
         </div>
         {hasConnector && <TrackerConnector state={connectorState} />}
         <div className={withBaseName("body")}>{children}</div>
+        {collapsible && <div className={withBaseName("indicator")}>
+        <button
+            className={clsx(withBaseName("expansion-toggle"))}
+            onClick={handleClick}
+            aria-expanded={expanded}
+            type="button"
+            >
+            <ExpansionIcon expanded={expanded} />
+          </button>
+        </div>}
       </li>
     );
   },

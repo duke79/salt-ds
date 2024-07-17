@@ -55,6 +55,26 @@ const useCheckInvalidChildren = (children: ReactNode) => {
   }, [children]);
 };
 
+const getDepthMap = (children: ReactNode) => {
+
+    const depths = Children.map(children, (child, i) => isValidElement(child) ? child.props.depth || 0 : 0);
+
+    const result = depths.reduce((acc, depth, i) => {
+        const lastIndexAtDepth = acc.lastIndexAtDepth;
+
+        const newAncestors = Array.from(Array(10).keys())
+            .map(d => lastIndexAtDepth[d])
+            .filter(index => index !== undefined);
+
+        lastIndexAtDepth[depth] = i;
+
+        const ancestors = [...acc.ancestors, newAncestors]
+
+        return { lastIndexAtDepth, ancestors };
+    }, { lastIndexAtDepth: [], ancestors: [] });
+    return result.ancestors;
+};
+
 export const SteppedTracker = forwardRef<HTMLUListElement, SteppedTrackerProps>(
   function SteppedTracker(
     {
@@ -74,6 +94,10 @@ export const SteppedTracker = forwardRef<HTMLUListElement, SteppedTrackerProps>(
     });
     useCheckInvalidChildren(children);
 
+    const depthMap = getDepthMap(children);
+    
+    console.log({depthMap})
+
     const totalSteps = Children.count(children);
 
     return (
@@ -84,7 +108,7 @@ export const SteppedTracker = forwardRef<HTMLUListElement, SteppedTrackerProps>(
           {...restProps}
         >
           {Children.map(children, (child, i) => (
-            <TrackerStepProvider stepNumber={i}>{child}</TrackerStepProvider>
+            <TrackerStepProvider stepNumber={i} parents={depthMap[i]}>{child}</TrackerStepProvider>
           ))}
         </ul>
       </SteppedTrackerProvider>
