@@ -2,6 +2,7 @@
 import installCoverageTask from "@cypress/code-coverage/task";
 import { defineConfig } from "cypress";
 import { devServer } from "cypress-rspack-dev-server";
+import { merge } from "webpack-merge";
 
 export default defineConfig({
   viewportWidth: 1280,
@@ -25,12 +26,11 @@ export default defineConfig({
       return devServer({
         ...devServerConfig,
         framework: "react",
-        rspackConfig: {
-          ...require("./rspack.config").default,
+        rspackConfig: merge(require("./rspack.config").default, {
           experiments: {
             lazyCompilation: !devServerConfig.cypressConfig.isTextTerminal,
           },
-        },
+        }),
       });
     },
     specPattern: "packages/**/src/**/*.cy.{js,ts,jsx,tsx}",

@@ -1,5 +1,6 @@
 import path from "node:path";
 import { defineConfig } from "@rspack/cli";
+import { version as reactVersion } from "react";
 
 const prod = true;
 
@@ -14,6 +15,10 @@ export default defineConfig({
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader", "postcss-loader"],
+      },
+      {
+        test: /packages\/.*\/src\/.*\.[tj]sx?$/,
+        use: ["babel-loader"],
       },
       {
         test: /\.(j|t)s$/,
@@ -62,6 +67,15 @@ export default defineConfig({
     tsConfig: {
       configFile: path.resolve(__dirname, "./tsconfig.json"),
       references: "auto",
+    },
+    alias: {
+      "cypress/react18": reactVersion.startsWith("18")
+        ? "cypress/react18"
+        : "cypress/react",
+      "@storybook/react-dom-shim":
+        reactVersion.startsWith("16") || reactVersion.startsWith("17")
+          ? "@storybook/react-dom-shim/dist/react-16"
+          : "@storybook/react-dom-shim",
     },
     extensions: ["...", ".ts", ".tsx", ".js", ".jsx", ".css"],
   },
