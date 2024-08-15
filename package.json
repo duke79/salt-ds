@@ -32,7 +32,7 @@
     "copy:icon:css": "yarn workspace @salt-ds/icons copy:css",
     "copy:countries:css": "yarn workspace @salt-ds/countries copy:css",
     "test": "vitest",
-    "test:components": "cypress run --component --browser chrome --headless",
+    "test:components": "cypress run --component --browser chrome",
     "test:components:local": "cypress open --component --browser electron",
     "prettier": "prettier --write .",
     "prettier:ci": "prettier --check .",

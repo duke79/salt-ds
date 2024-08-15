@@ -9,7 +9,7 @@ export default defineConfig({
   video: false,
   component: {
     setupNodeEvents(on, config) {
-      installCoverageTask(on, config);
+      // installCoverageTask(on, config);
       //Setting up a log task to allow logging to the console during an axe test because console.log() does not work directly in a test
       on("task", {
         log(message: string) {
@@ -25,6 +25,12 @@ export default defineConfig({
       return devServer({
         ...devServerConfig,
         framework: "react",
+        rspackConfig: {
+          ...require("./rspack.config").default,
+          experiments: {
+            lazyCompilation: !devServerConfig.cypressConfig.isTextTerminal,
+          },
+        },
       });
     },
     specPattern: "packages/**/src/**/*.cy.{js,ts,jsx,tsx}",

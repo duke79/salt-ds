@@ -8,6 +8,10 @@ export default defineConfig({
   module: {
     rules: [
       {
+        test: /\.png$/,
+        type: "asset",
+      },
+      {
         test: /\.css$/,
         use: ["style-loader", "css-loader", "postcss-loader"],
       },
@@ -60,8 +64,5 @@ export default defineConfig({
       references: "auto",
     },
     extensions: ["...", ".ts", ".tsx", ".js", ".jsx", ".css"],
-  },
-  experiments: {
-    lazyCompilation: true,
   },
 });
