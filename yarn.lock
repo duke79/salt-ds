@@ -2965,7 +2965,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cypress/request@npm:^3.0.0":
+"@cypress/request@npm:^3.0.1":
   version: 3.0.1
   resolution: "@cypress/request@npm:3.0.1"
   dependencies:
@@ -5991,9 +5991,9 @@ __metadata:
     chromatic: "npm:^11.10.1"
     ci-info: "npm:^3.3.1"
     clsx: "npm:^2.0.0"
-    cypress: "npm:^13.8.0"
+    cypress: "npm:^13.13.3"
     cypress-axe: "npm:^1.5.0"
-    cypress-real-events: "npm:^1.12.0"
+    cypress-real-events: "npm:^1.13.0"
     cypress-rspack-dev-server: "npm:^0.0.6"
     deepmerge: "npm:^4.2.2"
     dom-accessibility-api: "npm:^0.7.0"
@@ -12108,12 +12108,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress-real-events@npm:^1.12.0":
-  version: 1.12.0
-  resolution: "cypress-real-events@npm:1.12.0"
+"cypress-real-events@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "cypress-real-events@npm:1.13.0"
   peerDependencies:
     cypress: ^4.x || ^5.x || ^6.x || ^7.x || ^8.x || ^9.x || ^10.x || ^11.x || ^12.x || ^13.x
-  checksum: 10/d7b7af876925ee4a8c1f19a99659a1265b2a64980504b3b947c93c95d27b5c7a94b2c38b19b64863daef9e01aab207a63644cb0a7d2adc7c30c4e8aec8a4a6f9
+  checksum: 10/085e2e4f456fdf4173fd07fc2602ce44d661256628a5b40e89092e9792533f46b808f97106d9f9ea0272279b5c10db4eef3f0606e3705d3638d552d0999425de
   languageName: node
   linkType: hard
 
@@ -12130,11 +12130,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:^13.8.0":
-  version: 13.8.0
-  resolution: "cypress@npm:13.8.0"
+"cypress@npm:^13.13.3":
+  version: 13.13.3
+  resolution: "cypress@npm:13.13.3"
   dependencies:
-    "@cypress/request": "npm:^3.0.0"
+    "@cypress/request": "npm:^3.0.1"
     "@cypress/xvfb": "npm:^1.2.4"
     "@types/sinonjs__fake-timers": "npm:8.1.1"
     "@types/sizzle": "npm:^2.3.2"
@@ -12173,12 +12173,12 @@ __metadata:
     request-progress: "npm:^3.0.0"
     semver: "npm:^7.5.3"
     supports-color: "npm:^8.1.1"
-    tmp: "npm:~0.2.1"
+    tmp: "npm:~0.2.3"
     untildify: "npm:^4.0.0"
     yauzl: "npm:^2.10.0"
   bin:
     cypress: bin/cypress
-  checksum: 10/114eaac462feb3ebb7a57dc088857cfeace1341ae4e84a3406ef8f487f3c0ec42f31d2b2c5de5411f26057502f50561f3d62fd019a8161933b615c6847fb5332
+  checksum: 10/8f4a7f27f4f3374247ef39be52027c1614f0447993d50dd83b98c4e5f1903fd9b506164cd5614bd03f2b5b1e604fb3bdb646530002bafda01e0510480530415f
   languageName: node
   linkType: hard
 
@@ -27575,12 +27575,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tmp@npm:^0.2.1, tmp@npm:~0.2.1":
-  version: 0.2.1
-  resolution: "tmp@npm:0.2.1"
-  dependencies:
-    rimraf: "npm:^3.0.0"
-  checksum: 10/445148d72df3ce99356bc89a7857a0c5c3b32958697a14e50952c6f7cf0a8016e746ababe9a74c1aa52f04c526661992f14659eba34d3c6701d49ba2f3cf781b
+"tmp@npm:^0.2.1, tmp@npm:~0.2.3":
+  version: 0.2.3
+  resolution: "tmp@npm:0.2.3"
+  checksum: 10/7b13696787f159c9754793a83aa79a24f1522d47b87462ddb57c18ee93ff26c74cbb2b8d9138f571d2e0e765c728fb2739863a672b280528512c6d83d511c6fa
   languageName: node
   linkType: hard
 
