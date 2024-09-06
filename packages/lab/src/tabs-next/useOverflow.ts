@@ -159,6 +159,7 @@ export function useOverflow({
     tabs.length,
   ]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to update when selected changes.
   useIsomorphicLayoutEffect(() => {
     updateOverflow();
   }, [updateOverflow, selected]);

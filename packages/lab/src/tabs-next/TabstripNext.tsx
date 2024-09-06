@@ -12,9 +12,9 @@ import {
   useState,
 } from "react";
 
-import { TabsContext } from "./TabNextContext";
 import { TabOverflowList } from "./TabOverflowList";
 import tabstripCss from "./TabstripNext.css";
+import { TabstripNextContext } from "./TabstripNextContext";
 import { useOverflow } from "./useOverflow";
 import { useTabstrip } from "./useTabstrip";
 
@@ -35,6 +35,7 @@ export interface TabstripNextProps
   /* The Tabs variant */
   variant?: "main" | "inline";
   onAdd?: () => void;
+  onClose?: (event: SyntheticEvent, value: string) => void;
 }
 
 export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
@@ -47,6 +48,7 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
       value,
       defaultValue,
       onAdd,
+      onClose,
       onChange,
       onKeyDown,
       style,
@@ -69,6 +71,7 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
       registerItem,
       setSelected,
       selected,
+      setActive,
       handleKeyDown,
       items,
       handleClose,
@@ -76,6 +79,7 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
       defaultSelected: defaultValue,
       selected: value,
       onChange,
+      onClose,
     });
 
     const [visible, hidden, isMeasuring] = useOverflow({
@@ -103,10 +107,19 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
         variant,
         setSelected,
         selected,
+        setActive,
         focusInside,
         handleClose,
       }),
-      [variant, setSelected, selected, registerItem, focusInside, handleClose],
+      [
+        variant,
+        setSelected,
+        selected,
+        registerItem,
+        focusInside,
+        handleClose,
+        setActive,
+      ],
     );
 
     const tabstripStyle = {
@@ -115,7 +128,7 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
     };
 
     return (
-      <TabsContext.Provider value={contextValue}>
+      <TabstripNextContext.Provider value={contextValue}>
         <div
           role="tablist"
           className={clsx(
@@ -150,7 +163,7 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
             {hidden}
           </TabOverflowList>
         </div>
-      </TabsContext.Provider>
+      </TabstripNextContext.Provider>
     );
   },
 );

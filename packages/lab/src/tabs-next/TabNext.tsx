@@ -16,7 +16,7 @@ import {
 
 import { CloseIcon } from "@salt-ds/icons";
 import tabCss from "./TabNext.css";
-import { useTabs } from "./TabNextContext";
+import { useTabstrip } from "./TabstripNextContext";
 
 const withBaseName = makePrefixer("saltTabNext");
 
@@ -24,7 +24,7 @@ export interface TabNextProps extends ComponentPropsWithoutRef<"div"> {
   /* Value prop is mandatory and must be unique in order for overflow to work. */
   disabled?: boolean;
   value: string;
-  onClose?: () => void;
+  closable?: boolean;
 }
 
 export const TabNext = forwardRef<HTMLDivElement, TabNextProps>(
@@ -35,7 +35,7 @@ export const TabNext = forwardRef<HTMLDivElement, TabNextProps>(
       className,
       disabled: disabledProp,
       onClick,
-      onClose,
+      closable,
       onKeyDown,
       onFocus,
       value,
@@ -51,10 +51,11 @@ export const TabNext = forwardRef<HTMLDivElement, TabNextProps>(
       registerItem,
       variant,
       setSelected,
+      setActive,
       selected,
       focusInside,
       handleClose,
-    } = useTabs();
+    } = useTabstrip();
     const disabled = disabledProp;
 
     const tabRef = useRef<HTMLDivElement>(null);
@@ -87,25 +88,38 @@ export const TabNext = forwardRef<HTMLDivElement, TabNextProps>(
 
     const handleFocus = () => {
       setFocused(true);
+      setActive(value);
     };
 
     const handleBlur = () => {
       setFocused(false);
     };
 
-    const handleCloseButton = (event: MouseEvent<HTMLButtonElement>) => {
-      onClose?.();
+    const handleCloseButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
       handleClose(event, value);
       event.stopPropagation();
+    };
+
+    const handleCloseButtonKeyDown = (
+      event: KeyboardEvent<HTMLButtonElement>,
+    ) => {
+      if (event.key === "Enter" || event.key === " ") {
+        handleClose(event, value);
+        event.stopPropagation();
+      }
     };
 
     return (
       <div
         className={clsx(withBaseName(), withBaseName(variant), className)}
         data-value={value}
-        aria-selected={selected === value || undefined}
+        aria-selected={selected === value}
         aria-disabled={disabled}
-        tabIndex={selected === value ? 0 : -1}
+        tabIndex={
+          (focusInside && focused) || (selected === value && !focusInside)
+            ? 0
+            : -1
+        }
         ref={handleRef}
         role="tab"
         onClick={!disabled ? handleClick : undefined}
@@ -118,14 +132,15 @@ export const TabNext = forwardRef<HTMLDivElement, TabNextProps>(
         <span className={withBaseName("label")} aria-hidden id={labelId}>
           {children}
         </span>
-        {onClose ? (
+        {closable ? (
           <Button
             aria-label="Dismiss tab"
             id={closeButtonId}
             aria-labelledby={clsx(closeButtonId, labelId)}
             tabIndex={focused || (!focusInside && selected === value) ? 0 : -1}
             variant="secondary"
-            onClick={handleCloseButton}
+            onClick={handleCloseButtonClick}
+            onKeyDown={handleCloseButtonKeyDown}
           >
             <CloseIcon aria-hidden />
           </Button>

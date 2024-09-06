@@ -91,7 +91,11 @@ export const TabOverflowList = forwardRef<HTMLDivElement, TabOverflowListProps>(
           onBlur={handleBlur}
           onClick={handleListClick}
           ref={refs.setFloating}
-          style={{ left: x ?? 0, top: y ?? 0, position: strategy }}
+          style={
+            !hidden
+              ? { left: x ?? 0, top: y ?? 0, position: strategy }
+              : undefined
+          }
           tabIndex={-1}
         >
           <div className={withBaseName("listContainer")}>{children}</div>

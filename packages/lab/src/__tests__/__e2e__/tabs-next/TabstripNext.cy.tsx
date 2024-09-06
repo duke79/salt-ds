@@ -39,7 +39,7 @@ describe("Given a Tabstrip", () => {
           .eq(1)
           .should("have.attr", "aria-selected", "true");
 
-        cy.findAllByRole("tab").eq(0).click();
+        cy.findAllByRole("tab").eq(0).realClick();
 
         cy.get("@onChange").should("have.been.calledOnce");
       });
@@ -56,7 +56,7 @@ describe("Given a Tabstrip", () => {
       it("THEN no overflow indicator will be present", () => {
         cy.mount(<DefaultTabstrip width={500} />);
         cy.findByRole("tablist")
-          .findByRole("tab", { name: /More tabs/ })
+          .findByRole("button", { name: /More tabs/ })
           .should("not.exist");
       });
     });
@@ -66,23 +66,22 @@ describe("Given a Tabstrip", () => {
         cy.mount(<DefaultTabstrip width={500} />);
         cy.get(".saltTabstripNext").invoke("css", "width", "350px");
         cy.findAllByRole("tab").should("have.length", 5);
-        cy.findByRole("tab", { name: /More tabs/ })
+        cy.findAllByRole("tab").filter(":visible").should("have.length", 3);
+        cy.findByRole("button", { name: /More tabs/ })
           .should("exist")
-          .click();
-        cy.findByRole("menu")
-          .findAllByRole("menuitem")
-          .should("have.length", 1);
+          .realClick();
+        cy.findAllByRole("tab").filter(":visible").should("have.length", 5);
       });
     });
   });
   describe("WHEN size is not the full width of it's parent", () => {
     it("THEN should not overflow if it has enough space", () => {
       cy.mount(<DefaultLeftAligned />);
-      cy.findByRole("tab", { name: /More tabs/ }).should("not.exist");
+      cy.findByRole("button", { name: /More tabs/ }).should("not.exist");
     });
     it("THEN should overflow if it there is not enough space", () => {
       cy.mount(<LotsOfTabsTabstrip />);
-      cy.findByRole("tab", { name: /More tabs/ }).should("exist");
+      cy.findByRole("button", { name: /More tabs/ }).should("exist");
     });
   });
 });
@@ -97,9 +96,8 @@ describe("Tab selection, Given a Tabstrip", () => {
           "aria-selected",
           "true",
         );
-        cy.findByRole("tab", { name: /More tabs/ }).realClick();
-        cy.findByRole("menu").should("be.visible");
-        cy.findByRole("menuitem", { name: "Loans" }).click();
+        cy.findByRole("button", { name: /More tabs/ }).realClick();
+        cy.findByRole("tab", { name: "Loans" }).realClick();
         cy.findAllByRole("tab", { name: "Loans" }).should("be.visible");
         cy.findAllByRole("tab", { name: "Loans" }).should(
           "have.attr",
@@ -160,12 +158,12 @@ describe("Navigation, Given a Tabstrip", () => {
         });
 
         describe("WHEN the left arrow key is pressed (from first tab)", () => {
-          it("THEN no navigation will occur", () => {
+          it("THEN navigation will wrap", () => {
             cy.mount(<DefaultTabstrip width={500} />);
             cy.findAllByRole("tab").eq(0).realClick();
             cy.findAllByRole("tab").eq(0).should("be.focused");
             cy.realPress("ArrowLeft");
-            cy.findAllByRole("tab").eq(0).should("be.focused");
+            cy.findAllByRole("tab").eq(-1).should("be.focused");
           });
         });
 
@@ -209,7 +207,7 @@ describe("Navigation, Given a Tabstrip", () => {
             cy.realPress("ArrowRight");
             cy.findAllByRole("tab").eq(4).should("be.focused");
             cy.realPress("ArrowRight");
-            cy.findAllByRole("tab").eq(4).should("be.focused");
+            cy.findAllByRole("tab").eq(0).should("be.focused");
           });
         });
       });
@@ -220,14 +218,14 @@ describe("Navigation, Given a Tabstrip", () => {
   //     it("THEN overflow indicator is included in keyboard navigation", () => {
   //       cy.mount(<DefaultTabstrip width={310} />);
   //       cy.findAllByRole("tab").eq(0).realClick();
-  //       cy.findByRole("tab", { name: /More tabs/ }).should("be.visible");
+  //       cy.findByRole("button", { name: /More tabs/ }).should("be.visible");
   //       cy.realPress("Tab");
-  //       cy.findByRole("tab", { name: /More tabs/ }).should("be.focused");
+  //       cy.findByRole("button", { name: /More tabs/ }).should("be.focused");
   //     });
   //
   //     it("THEN overflow indicator opens overflow menu", () => {
   //       cy.mount(<DefaultTabstrip width={320} />);
-  //       cy.findByRole("tab", { name: /More tabs/ })
+  //       cy.findByRole("button", { name: /More tabs/ })
   //         .focus()
   //         .realPress("Enter");
   //       cy.findByRole("menu");
@@ -237,8 +235,7 @@ describe("Navigation, Given a Tabstrip", () => {
   describe("WHEN overflow is opened", () => {
     it("THEN overflow menu item can be selected with Enter and focus is moved to the active tab", () => {
       cy.mount(<DefaultTabstrip width={200} />);
-      cy.findByRole("tab", { name: /More tabs/ }).click();
-      cy.findByRole("menu").should("exist");
+      cy.findByRole("button", { name: /More tabs/ }).realClick();
       cy.realPress("ArrowDown").realPress("Enter");
       cy.focused()
         .should("have.attr", "aria-selected", "true")

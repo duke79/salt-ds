@@ -8,7 +8,7 @@ import {
 } from "@salt-ds/icons";
 import { TabNext, TabstripNext, type TabstripNextProps } from "@salt-ds/lab";
 import type { StoryFn } from "@storybook/react";
-import { type ComponentType, useState } from "react";
+import { type ComponentType, useRef, useState } from "react";
 
 import "./tabstrip-next.stories.css";
 
@@ -243,10 +243,7 @@ LotsOfTabsTabstrip.args = {
   ],
 };
 
-export const Dismissable: TabstripStory = ({
-  width = 600,
-  ...tabstripProps
-}) => {
+export const Closable: TabstripStory = ({ width = 600, ...tabstripProps }) => {
   const [tabs, setTabs] = useState([
     "Home",
     "Transactions",
@@ -257,15 +254,15 @@ export const Dismissable: TabstripStory = ({
 
   return (
     <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
-      <TabstripNext defaultValue={tabs[0]} {...tabstripProps}>
+      <TabstripNext
+        defaultValue={tabs[0]}
+        onClose={(_event, closedTab) => {
+          setTabs(tabs.filter((tab) => tab !== closedTab));
+        }}
+        {...tabstripProps}
+      >
         {tabs.map((label) => (
-          <TabNext
-            value={label}
-            key={label}
-            onClose={() => {
-              setTabs(tabs.filter((tab) => tab !== label));
-            }}
-          >
+          <TabNext value={label} key={label} closable>
             {label}
             {label === "Transactions" && <Badge value={2} />}
           </TabNext>
@@ -276,21 +273,26 @@ export const Dismissable: TabstripStory = ({
 };
 
 export const AddTabs: TabstripStory = ({ width = 600, ...tabstripProps }) => {
-  const [tabs, setTabs] = useState(["Tab 1", "Tab 2", "Tab 3"]);
+  const [tabs, setTabs] = useState(["Home", "Transactions", "Loans"]);
+  const [value, setValue] = useState("Home");
+  const newCount = useRef(0);
 
   return (
     <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
       <TabstripNext
-        defaultValue={tabs[0]}
+        value={value}
+        onChange={(_event, newValue) => setValue(newValue)}
         onAdd={() => {
-          setTabs((old) => old.concat([`Tab ${old.length + 1}`]));
+          const newTab = `New Tab${newCount.current > 0 ? ` ${newCount.current}` : ""}`;
+          newCount.current += 1;
+
+          setTabs((old) => old.concat(newTab));
+          setValue(newTab);
         }}
-        {...tabstripProps}
       >
         {tabs.map((label) => (
           <TabNext value={label} key={label}>
             {label}
-            {label === "Transactions" && <Badge value={2} />}
           </TabNext>
         ))}
       </TabstripNext>

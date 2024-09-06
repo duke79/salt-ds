@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import type { TabstripNextProps } from "./TabstripNext";
 
 export interface Item {
   id: string;
@@ -107,7 +108,6 @@ function useCollection({ wrap }: UseCollectionProps) {
       return items[newIndex]?.id;
     },
     getFirst: () => {
-      console.log(items);
       return items[0]?.id;
     },
     getLast: () => {
@@ -121,10 +121,12 @@ export function useTabstrip({
   selected: selectedProp,
   defaultSelected,
   onChange,
+  onClose,
 }: {
-  selected?: string;
-  defaultSelected?: string;
-  onChange?: (event: SyntheticEvent, selected: string) => void;
+  selected?: TabstripNextProps["value"];
+  defaultSelected?: TabstripNextProps["defaultValue"];
+  onChange?: TabstripNextProps["onChange"];
+  onClose?: TabstripNextProps["onClose"];
 }) {
   const { registerItem, item, getNext, getPrevious, getFirst, getLast, items } =
     useCollection({ wrap: true });
@@ -167,6 +169,7 @@ export function useTabstrip({
       } else {
         setActive(newActive);
       }
+      onClose?.(event, id);
     },
     [getFirst, getNext, getPrevious, selected],
   );
