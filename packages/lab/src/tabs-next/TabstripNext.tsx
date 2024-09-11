@@ -6,6 +6,7 @@ import clsx from "clsx";
 import {
   type ComponentPropsWithoutRef,
   type SyntheticEvent,
+  type FocusEvent,
   forwardRef,
   useMemo,
   useRef,
@@ -93,8 +94,10 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
 
     const [focusInside, setFocusInside] = useState(false);
 
-    const handleFocus = () => {
-      setFocusInside(true);
+    const handleFocus = (event: FocusEvent) => {
+      if (event.target !== addButtonRef.current) {
+        setFocusInside(true);
+      }
     };
 
     const handleBlur = () => {
@@ -146,6 +149,12 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
           {...rest}
         >
           {visible}
+          <TabOverflowList
+            isMeasuring={isMeasuring}
+            buttonRef={overflowButtonRef}
+          >
+            {hidden}
+          </TabOverflowList>
           {onAdd && (
             <Button
               ref={addButtonRef}
@@ -156,12 +165,6 @@ export const TabstripNext = forwardRef<HTMLDivElement, TabstripNextProps>(
               <AddIcon aria-hidden />
             </Button>
           )}
-          <TabOverflowList
-            isMeasuring={isMeasuring}
-            buttonRef={overflowButtonRef}
-          >
-            {hidden}
-          </TabOverflowList>
         </div>
       </TabstripNextContext.Provider>
     );

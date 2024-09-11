@@ -10,6 +10,7 @@ import {
   type Ref,
   forwardRef,
   useState,
+  useEffect,
 } from "react";
 import tabOverflowListCss from "./TabOverflowList.css";
 
@@ -33,23 +34,7 @@ export const TabOverflowList = forwardRef<HTMLDivElement, TabOverflowListProps>(
       window: targetWindow,
     });
 
-    const handleClick = () => {
-      setHidden((old) => !old);
-    };
-
-    const handleFocus = () => {
-      setHidden(false);
-    };
-
-    const handleBlur = () => {
-      setHidden(true);
-    };
-
-    const handleListClick = () => {
-      setHidden(true);
-    };
-
-    const { refs, x, y, strategy } = useFloatingUI({
+    const { refs, x, y, strategy, elements } = useFloatingUI({
       open: !hidden,
       placement: "bottom-start",
       middleware: [
@@ -64,10 +49,46 @@ export const TabOverflowList = forwardRef<HTMLDivElement, TabOverflowListProps>(
       ],
     });
 
+    const handleClick = () => {
+      setHidden((old) => !old);
+      setTimeout(() => {
+        const firstTab =
+          elements.floating?.querySelector<HTMLElement>("[role=tab]");
+        firstTab?.focus({ preventScroll: true });
+      });
+    };
+
+    const handleFocus = () => {
+      setHidden(false);
+    };
+
+    const handleBlur = () => {
+      setHidden(true);
+    };
+
+    const handleListClick = () => {
+      setHidden(true);
+    };
+
     const handleButtonRef = useForkRef<HTMLButtonElement>(
       buttonRef,
       refs.setReference,
     );
+
+    useEffect(() => {
+      const handleFocus = (event: FocusEvent) => {
+        console.log(elements.floating, event.target);
+        if (!elements.floating?.contains(event.target as Node)) {
+          setHidden(true);
+        }
+      };
+
+      targetWindow?.addEventListener("focus", handleFocus);
+
+      return () => {
+        targetWindow?.removeEventListener("focus", handleFocus);
+      };
+    }, [targetWindow, elements]);
 
     if (Children.count(children) === 0 && !isMeasuring) return null;
 

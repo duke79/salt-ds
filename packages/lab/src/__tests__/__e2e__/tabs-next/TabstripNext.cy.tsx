@@ -213,30 +213,12 @@ describe("Navigation, Given a Tabstrip", () => {
       });
     });
   });
-  // describe("WHEN initial size is not sufficient to display all contents", () => {
-  //   describe("WHEN it initially renders", () => {
-  //     it("THEN overflow indicator is included in keyboard navigation", () => {
-  //       cy.mount(<DefaultTabstrip width={310} />);
-  //       cy.findAllByRole("tab").eq(0).realClick();
-  //       cy.findByRole("button", { name: /More tabs/ }).should("be.visible");
-  //       cy.realPress("Tab");
-  //       cy.findByRole("button", { name: /More tabs/ }).should("be.focused");
-  //     });
-  //
-  //     it("THEN overflow indicator opens overflow menu", () => {
-  //       cy.mount(<DefaultTabstrip width={320} />);
-  //       cy.findByRole("button", { name: /More tabs/ })
-  //         .focus()
-  //         .realPress("Enter");
-  //       cy.findByRole("menu");
-  //     });
-  //   });
-  // });
+
   describe("WHEN overflow is opened", () => {
     it("THEN overflow menu item can be selected with Enter and focus is moved to the active tab", () => {
       cy.mount(<DefaultTabstrip width={200} />);
       cy.findByRole("button", { name: /More tabs/ }).realClick();
-      cy.realPress("ArrowDown").realPress("Enter");
+      cy.realPress("ArrowRight").realPress("Enter");
       cy.focused()
         .should("have.attr", "aria-selected", "true")
         .should("have.attr", "role", "tab");
