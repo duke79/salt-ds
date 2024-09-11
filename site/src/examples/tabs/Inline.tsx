@@ -1,9 +1,9 @@
 import { TabNext, TabstripNext } from "@salt-ds/lab";
 import type { ReactElement } from "react";
 
-export const Inline = (): ReactElement => {
-  const tabs = ["Home", "Transactions", "Loans", "Checks", "Liquidity"];
+const tabs = ["Home", "Transactions", "Loans", "Checks", "Liquidity"];
 
+export const Inline = (): ReactElement => {
   return (
     <TabstripNext
       variant="inline"

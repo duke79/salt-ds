@@ -77,8 +77,8 @@ export const TabOverflowList = forwardRef<HTMLDivElement, TabOverflowListProps>(
 
     useEffect(() => {
       const handleFocus = (event: FocusEvent) => {
-        console.log(elements.floating, event.target);
-        if (!elements.floating?.contains(event.target as Node)) {
+        console.log(elements.floating, event.currentTarget);
+        if (!elements.floating?.contains(event.currentTarget as HTMLElement)) {
           setHidden(true);
         }
       };
