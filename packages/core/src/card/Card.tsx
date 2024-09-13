@@ -1,9 +1,14 @@
 import { useComponentCssInjection } from "@salt-ds/styles";
 import { useWindow } from "@salt-ds/window";
 import { clsx } from "clsx";
-import { type ComponentPropsWithoutRef, forwardRef } from "react";
+import {
+  type ComponentPropsWithoutRef,
+  forwardRef,
+  useLayoutEffect,
+  useRef,
+} from "react";
 
-import { capitalize, makePrefixer } from "../utils";
+import { capitalize, makePrefixer, useForkRef } from "../utils";
 
 import cardCss from "./Card.css";
 
@@ -56,6 +61,27 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       window: targetWindow,
     });
 
+    const cardRef = useRef<HTMLDivElement | null>(null);
+    const handleRef = useForkRef(cardRef, ref);
+
+    useLayoutEffect(() => {
+      if (!cardRef.current) return;
+
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          for (const addedNode of mutation.addedNodes) {
+            console.log(addedNode);
+          }
+        }
+      });
+
+      observer.observe(cardRef.current, { subtree: false, childList: true });
+
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
+
     return (
       <div
         className={clsx(
@@ -71,7 +97,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           },
           className,
         )}
-        ref={ref}
+        ref={handleRef}
         {...rest}
       >
         {children}
