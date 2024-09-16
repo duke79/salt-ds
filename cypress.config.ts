@@ -1,8 +1,9 @@
 // @ts-ignore
-import installCoverageTask from "@cypress/code-coverage/task";
 import { defineConfig } from "cypress";
 import { devServer } from "cypress-rspack-dev-server";
+import { version as reactVersion } from "react";
 import { merge } from "webpack-merge";
+// import installCoverageTask from "@cypress/code-coverage/task";
 
 export default defineConfig({
   viewportWidth: 1280,
@@ -27,6 +28,13 @@ export default defineConfig({
         ...devServerConfig,
         framework: "react",
         rspackConfig: merge(require("./rspack.config").default, {
+          resolve: {
+            alias: {
+              "cypress/react18": reactVersion.startsWith("18")
+                ? "cypress/react18"
+                : "cypress/react",
+            },
+          },
           experiments: {
             lazyCompilation: !devServerConfig.cypressConfig.isTextTerminal,
           },
