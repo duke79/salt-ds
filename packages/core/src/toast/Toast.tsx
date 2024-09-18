@@ -26,7 +26,7 @@ export interface ToastProps extends ComponentPropsWithoutRef<"div"> {
    */
   icon?: ReactElement<IconProps>;
   /**
-   * Time in milliseconds to auto-hide the toast. Default is 5000ms (5 seconds)
+   * Time in milliseconds to auto-hide the toast. If set to 0 or no value provided, the toast will not auto-hide.
    */
   autoHideDuration?: number;
 }
@@ -44,7 +44,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
     });
 
     useEffect(() => {
-      if (autoHideDuration > 0) {
+      if (autoHideDuration && autoHideDuration > 0) {
         const timer = setTimeout(() => {
           setIsVisible(false);
         }, autoHideDuration);
